@@ -19,26 +19,31 @@ class AddProductStates(StatesGroup):
 	quantity = State()
 
 
-async def add_product(message: Message) -> None:
+class ShowEveryoneStates(StatesGroup):
+	show = State()
+
+
+async def add_product(message: Message):
+	# todo: сделать проверку статуса, доступно только админам
 	await bot.send_message(message.from_id, 'Введите название товара')
 	await AddProductStates.name.set()
 
 
-async def add_product_name(message: Message, state=FSMContext) -> None:
+async def add_product_name(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['name'] = message.text
 	await bot.send_message(message.from_id, 'Введите категории товара')
 	await AddProductStates.next()
 
 
-async def add_product_category(message: Message, state=FSMContext) -> None:
+async def add_product_category(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['category'] = message.text
 	await bot.send_message(message.from_id, 'Введите описание товара')
 	await AddProductStates.next()
 
 
-async def add_product_description(message: Message, state=FSMContext) -> None:
+async def add_product_description(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['description'] = message.text
 	await bot.send_message(message.from_id, 'Прикрепите к сообщению фото и/или видео товара')
@@ -46,7 +51,7 @@ async def add_product_description(message: Message, state=FSMContext) -> None:
 
 
 @media_group_handler
-async def add_product_media_group(messages: list[Message], state=FSMContext) -> None:
+async def add_product_media_group(messages: list[Message], state=FSMContext):
 	"""В телеграмме фото и видео имеют уникальный file_id,
 	который можно отправить и сохранить в базу данных
 	
@@ -65,7 +70,7 @@ async def add_product_media_group(messages: list[Message], state=FSMContext) -> 
 	await AddProductStates.next()
 
 
-async def add_product_media(message: Message, state=FSMContext) -> None:
+async def add_product_media(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		if message.photo:
 			data['images'] = [message.photo[-1].file_id]
@@ -75,14 +80,14 @@ async def add_product_media(message: Message, state=FSMContext) -> None:
 	await AddProductStates.next()
 
 
-async def add_product_price(message: Message, state=FSMContext) -> None:
+async def add_product_price(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['price'] = int(message.text)
 	await bot.send_message(message.from_id, 'Введите доступное на данный момент количество единиц товара')
 	await AddProductStates.next()
 
 
-async def add_product_quantity(message: Message, state=FSMContext) -> None:
+async def add_product_quantity(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['quantity'] = message.text
 		if 'images' not in data.keys():
@@ -109,8 +114,38 @@ async def add_product_quantity(message: Message, state=FSMContext) -> None:
 	await state.finish()
 
 
-async def add_product_cancel(message: Message, state=FSMContext) -> None:
+async def add_product_cancel(message: Message, state=FSMContext):
 	if await state.get_state() is None:
 		return
 	await bot.send_message(message.from_id, 'Добавление товара прекращено')
+	await state.finish()
+
+
+async def send_all_start(message: Message):
+	# todo: сделать проверку статуса, доступно только админам
+	await message.reply('Ваше следующее сообщение отправится всем пользователям бота')
+	await ShowEveryoneStates.show.set()
+
+
+async def send_all_end(message: Message, state: FSMContext):
+	persons = []  # todo: сделать запрос к бд для получения пользователей (без админов)
+	for person in persons:
+		await message.copy_to(person.id)
+	await message.reply('Это сообщение было отправлено всем пользователям')
+	await state.finish()
+
+
+async def send_all_cancel(message: Message, state=FSMContext):
+	if await state.get_state() is None:
+		return
+	await bot.send_message(message.from_id, 'Пересылка следующего сообщения отключена')
+	await state.finish()
+
+
+@media_group_handler
+async def send_all_media_group_end(messages: list[Message], state: FSMContext):
+	persons = []  # todo: сделать запрос к бд для получения пользователей (без админов)
+	for person in persons:
+		await messages[0].copy_to(person.id)
+	await messages[0].reply('Это сообщение было отправлено всем пользователям')
 	await state.finish()
