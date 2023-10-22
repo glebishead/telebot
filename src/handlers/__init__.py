@@ -30,6 +30,13 @@ def register_user_handlers():
 	dp.register_message_handler(add_product_price, state=AddProductStates.price)
 	dp.register_message_handler(add_product_quantity, state=AddProductStates.quantity)
 	
+	dp.register_message_handler(send_all_start, commands=['send_all'])
+	dp.register_message_handler(send_all_cancel, commands=['cancel'], state=ShowEveryoneStates.show)
+	dp.register_message_handler(send_all_media_group_end, MediaGroupFilter(is_media_group=True),
+	                            content_types=['photo', 'video'], state=ShowEveryoneStates.show)
+	dp.register_message_handler(send_all_end, content_types=['photo', 'video', 'sticker', 'text'],
+	                            state=ShowEveryoneStates.show)
+	
 	# оставить последним, это заглушка
 	dp.register_message_handler(plug)
 
