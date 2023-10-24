@@ -4,6 +4,7 @@ import aiomysql
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
+
 async def selecteverything():
     try:
         db = await aiomysql.connect(user='root',
@@ -16,13 +17,12 @@ async def selecteverything():
         await cursor.execute('USE telegrambot;')
 
         await cursor.execute("SELECT * FROM users;")
-        print(await cursor.fetchall())
+        return await cursor.fetchall()
 
     except aiomysql.Error as err:
         print(err)
 
     finally:
         db.close()
-        print("connection closed successfully")
 
 loop.run_until_complete(selecteverything())
