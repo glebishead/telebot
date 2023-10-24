@@ -2,12 +2,15 @@
 
 """
 
-from aiogram.types import Message
+from aiogram.types import Message, MediaGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.utils.exceptions import ChatNotFound
 from aiogram_media_group import media_group_handler
 
 from src import bot
+from mysql.selecteverything import selecteverything
+from mysql.mysql import database
 
 
 class AddProductStates(StatesGroup):
@@ -128,9 +131,15 @@ async def send_all_start(message: Message):
 
 
 async def send_all_end(message: Message, state: FSMContext):
-	persons = []  # todo: сделать запрос к бд для получения пользователей (без админов)
+	persons = [*await selecteverything()]
 	for person in persons:
-		await message.copy_to(person.id)
+		# id, name, register_date, status = person
+		# когда бд изменится закомменить код ниже, выше раскомментить
+		id, register_date, status = person
+		try:
+			await message.copy_to(id)
+		except ChatNotFound:
+			print(f"Person with id {id} not found")
 	await message.reply('Это сообщение было отправлено всем пользователям')
 	await state.finish()
 
@@ -144,8 +153,17 @@ async def send_all_cancel(message: Message, state=FSMContext):
 
 @media_group_handler
 async def send_all_media_group_end(messages: list[Message], state: FSMContext):
-	persons = []  # todo: сделать запрос к бд для получения пользователей (без админов)
+	persons = [*await selecteverything()]
 	for person in persons:
-		await messages[0].copy_to(person.id)
+		# id, name, register_date, status = person
+		# когда бд изменится закомменить код ниже, выше раскомментить
+		id, register_date, status = person
+		try:
+			media = MediaGroup()
+			for j in range(len(messages)):
+				media.attach_photo(messages[j]['photo'][1]['file_id'], caption=messages[0].text)
+			await bot.send_media_group(id, media=media)
+		except ChatNotFound:
+			print(f"Person with id {id} not found")
 	await messages[0].reply('Это сообщение было отправлено всем пользователям')
 	await state.finish()

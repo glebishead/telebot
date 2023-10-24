@@ -4,6 +4,7 @@ import aiomysql
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
+
 async def describe():
     try:
         db = await aiomysql.connect(user='root',
@@ -23,6 +24,5 @@ async def describe():
 
     finally:
         db.close()
-        print("connection closed successfully")
 
 loop.run_until_complete(describe())
