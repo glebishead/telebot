@@ -5,8 +5,8 @@ import time
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
+async def database(telegramid, userid):
 
-async def database(telegramid):
     y = (time.strftime(time.strftime("%Y-%m-%d", time.localtime())) + ' ' + time.strftime(time.strftime("%H:%M:%S", time.localtime())))
 
     try:
@@ -19,10 +19,12 @@ async def database(telegramid):
 
         await cursor.execute('USE telegrambot;')
 
-        insert_query = """INSERT INTO users (telegaid, regdatetime, isconsumer) 
-                                        VALUES (%s, %s, %s) """ # не обращайте внимания что тут все желтое так нужно
+        insert_query = """INSERT INTO users (telegaid, userid, regdatetime, isconsumer, isadmin) 
+                                        VALUES (%s, %s, %s, %s, %s) """ # не обращайте внимания что тут все желтое так нужно
 
-        dannie = (telegramid, y, '2')  # на переменные тоже внимание не обращайте
+
+        dannie = (telegramid, userid, y , '1', '0') # на переменные тоже внимание не обращайте
+
 
         await cursor.execute(insert_query, dannie)
 
@@ -37,7 +39,10 @@ async def database(telegramid):
         db.close() # хз выполняется ли эта строчка, должна закрывать коннект
 
 
-# loop.run_until_complete(database("glebislove"))
+
+#loop.run_until_complete(database("14881337", "glebislove"))
+
+
 
 # добавить в бд нового пользователя с параметром 2 в isconsumer
 # параметр 2 означает (пока что) что пользователь не consumer и не prodavec
