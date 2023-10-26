@@ -5,44 +5,38 @@ import time
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
-async def database(telegramid, userid):
+async def database(telegram_id, user_id):
 
-    y = (time.strftime(time.strftime("%Y-%m-%d", time.localtime())) + ' ' + time.strftime(time.strftime("%H:%M:%S", time.localtime())))
+    datetime = (time.strftime(time.strftime("%Y-%m-%d", time.localtime())) + ' ' + time.strftime(time.strftime("%H:%M:%S", time.localtime())))
 
     try:
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
                                     host='78.36.203.224',
-                                    db='telegrambot') # прошу не смотрите на мои пороли ((((влад гей данил подтвердил влада взломали
+                                    db='db') #connection open
 
         cursor = await db.cursor()
 
-        await cursor.execute('USE telegrambot;')
+        await cursor.execute('USE db;') # selecting db.db
 
-        insert_query = """INSERT INTO users (telegaid, userid, regdatetime, isconsumer, isadmin) 
-                                        VALUES (%s, %s, %s, %s, %s) """ # не обращайте внимания что тут все желтое так нужно
+        insert_query = """INSERT INTO users (telegram_id, user_id, regdatetime, is_admin) 
+                                        VALUES (%s, %s, %s, %s) """
 
 
-        dannie = (telegramid, userid, y , '1', '0') # на переменные тоже внимание не обращайте
+        dannie = (telegram_id, user_id, datetime , '0')
 
 
         await cursor.execute(insert_query, dannie)
 
-        await db.commit() # просто обязательная штука здесь
+        await db.commit()
 
-        cursor.close() # ТЫ ЛОХ БЛЯТЬ
-
-    except aiomysql.Error as err: # а это вообще никогда не должно выполняться желательно
+    except aiomysql.Error as err:
         print(err)
 
     finally:
-        db.close() # хз выполняется ли эта строчка, должна закрывать коннект
+        db.close() #connection close
 
 
 
 #loop.run_until_complete(database("14881337", "glebislove"))
 
-
-
-# добавить в бд нового пользователя с параметром 2 в isconsumer
-# параметр 2 означает (пока что) что пользователь не consumer и не prodavec
