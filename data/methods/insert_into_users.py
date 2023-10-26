@@ -6,7 +6,7 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-async def database(telegramid):
+async def insert_into_users(telegramid):
     y = (time.strftime(time.strftime("%Y-%m-%d", time.localtime())) + ' ' + time.strftime(time.strftime("%H:%M:%S", time.localtime())))
 
     try:

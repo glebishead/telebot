@@ -9,8 +9,7 @@ from aiogram.utils.exceptions import ChatNotFound
 from aiogram_media_group import media_group_handler
 
 from src import bot
-from mysql.selecteverything import selecteverything
-from mysql.mysql import database
+from data.methods.select_from_users import selecteverything
 
 
 class AddProductStates(StatesGroup):
