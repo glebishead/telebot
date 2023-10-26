@@ -25,4 +25,4 @@ async def select_from_users():
     finally:
         db.close()
 
-loop.run_until_complete(selecteverything())
+loop.run_until_complete(select_from_users())

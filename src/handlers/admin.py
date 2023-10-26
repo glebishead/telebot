@@ -9,7 +9,7 @@ from aiogram.utils.exceptions import ChatNotFound
 from aiogram_media_group import media_group_handler
 
 from src import bot
-from data.methods.select_from_users import selecteverything
+from data.methods.select_from_users import select_from_users
 
 
 class AddProductStates(StatesGroup):
@@ -130,7 +130,7 @@ async def send_all_start(message: Message):
 
 
 async def send_all_end(message: Message, state: FSMContext):
-	persons = [*await selecteverything()]
+	persons = [*await select_from_users()]
 	for person in persons:
 		# id, name, register_date, status = person
 		# когда бд изменится закомменить код ниже, выше раскомментить
@@ -152,7 +152,7 @@ async def send_all_cancel(message: Message, state=FSMContext):
 
 @media_group_handler
 async def send_all_media_group_end(messages: list[Message], state: FSMContext):
-	persons = [*await selecteverything()]
+	persons = [*await select_from_users()]
 	for person in persons:
 		# id, name, register_date, status = person
 		# когда бд изменится закомменить код ниже, выше раскомментить
