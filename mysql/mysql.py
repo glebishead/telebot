@@ -13,7 +13,7 @@ async def database(telegramid, userid):
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
                                     host='78.36.203.224',
-                                    db='telegrambot') # прошу не смотрите на мои пороли ((((влад гей
+                                    db='telegrambot') # прошу не смотрите на мои пороли ((((влад гей данил подтвердил влада взломали
 
         cursor = await db.cursor()
 
@@ -30,7 +30,7 @@ async def database(telegramid, userid):
 
         await db.commit() # просто обязательная штука здесь
 
-        cursor.close # вот я хз почему оно желтым горит, но это сука не важно главное работает
+        cursor.close() # ТЫ ЛОХ БЛЯТЬ
 
     except aiomysql.Error as err: # а это вообще никогда не должно выполняться желательно
         print(err)
