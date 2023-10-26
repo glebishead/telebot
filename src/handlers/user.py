@@ -6,11 +6,13 @@
 from aiogram.types import Message
 
 from src import bot
+from data.methods.insert_into_users import database
 
 
 async def start(message: Message):
 	with open(f'static/stickers/StartSticker.tgs') as sticker:
 		await bot.send_sticker(message.from_id, sticker)
+	await database(message.from_id)
 	await message.reply('Hello')
 
 
