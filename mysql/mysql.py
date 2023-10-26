@@ -13,7 +13,7 @@ async def database(telegramid, userid):
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
                                     host='78.36.203.224',
-                                    db='telegrambot') # прошу не смотрите на мои пороли ((((
+                                    db='telegrambot') # прошу не смотрите на мои пороли ((((влад гей
 
         cursor = await db.cursor()
 
