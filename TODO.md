@@ -1,9 +1,8 @@
 # Roles:
-База данных - SSmartXYZ
-
-Общий дизайн - Vladislawka
-
-Общие функции бота - Daniel и glebishead
+### Разработчик базы данных - [SSmartXYZ](https://github.com/SSmartXYZ)
+### Дизайнер - [Vladislawka](https://github.com/SSmartXYZ)
+### Разработчик - [Daniel](https://github.com/Daniel)
+### Тимлид  - [glebishead](https://github.com/glebishead)
 
 # TODO:
 
