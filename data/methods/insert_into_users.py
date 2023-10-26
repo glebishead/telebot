@@ -5,39 +5,38 @@ import time
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
+async def database(telegram_id, user_id):
 
-async def insert_into_users(telegramid):
-    y = (time.strftime(time.strftime("%Y-%m-%d", time.localtime())) + ' ' + time.strftime(time.strftime("%H:%M:%S", time.localtime())))
+    datetime = (time.strftime(time.strftime("%Y-%m-%d", time.localtime())) + ' ' + time.strftime(time.strftime("%H:%M:%S", time.localtime())))
 
     try:
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
                                     host='78.36.203.224',
-                                    db='telegrambot') # прошу не смотрите на мои пороли ((((
+                                    db='db') #connection open
 
         cursor = await db.cursor()
 
-        await cursor.execute('USE telegrambot;')
+        await cursor.execute('USE db;') # selecting db.db
 
-        insert_query = """INSERT INTO users (telegaid, regdatetime, isconsumer) 
-                                        VALUES (%s, %s, %s) """ # не обращайте внимания что тут все желтое так нужно
+        insert_query = """INSERT INTO users (telegram_id, user_id, regdatetime, is_admin) 
+                                        VALUES (%s, %s, %s, %s) """
 
-        dannie = (telegramid, y, '2')  # на переменные тоже внимание не обращайте
+
+        dannie = (telegram_id, user_id, datetime , '0')
+
 
         await cursor.execute(insert_query, dannie)
 
-        await db.commit() # просто обязательная штука здесь
+        await db.commit()
 
-        cursor.close # вот я хз почему оно желтым горит, но это сука не важно главное работает
-
-    except aiomysql.Error as err: # а это вообще никогда не должно выполняться желательно
+    except aiomysql.Error as err:
         print(err)
 
     finally:
-        db.close() # хз выполняется ли эта строчка, должна закрывать коннект
+        db.close() #connection close
 
 
-# loop.run_until_complete(database("glebislove"))
 
-# добавить в бд нового пользователя с параметром 2 в isconsumer
-# параметр 2 означает (пока что) что пользователь не consumer и не prodavec
+#loop.run_until_complete(database("14881337", "glebislove"))
+
