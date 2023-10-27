@@ -8,10 +8,12 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.utils.exceptions import ChatNotFound
 from aiogram_media_group import media_group_handler
 
-from src import bot
+from src import bot, ADMIN_ID
 from mysql.selecteverything import selecteverything
 from mysql.mysql import database
 
+def is_admin(userid):
+	return userid == ADMIN_ID  # здесь должен быть лист
 
 class AddProductStates(StatesGroup):
 	name = State()
@@ -28,6 +30,9 @@ class ShowEveryoneStates(StatesGroup):
 
 async def add_product(message: Message):
 	# todo: сделать проверку статуса, доступно только админам
+	if not is_admin(message.from_user.id):
+		await bot.send_message(message.from_user.id, "Вы не являетесь администратором, поэтому функция недоступна")
+		return
 	await bot.send_message(message.from_id, 'Введите название товара')
 	await AddProductStates.name.set()
 
