@@ -13,7 +13,8 @@ from mysql.selecteverything import selecteverything
 from mysql.mysql import database
 
 def is_admin(userid):
-	return userid == ADMIN_ID  # здесь должен быть лист
+	# todo: admin_list
+	return userid == ADMIN_ID
 
 class AddProductStates(StatesGroup):
 	name = State()
@@ -29,7 +30,6 @@ class ShowEveryoneStates(StatesGroup):
 
 
 async def add_product(message: Message):
-	# todo: сделать проверку статуса, доступно только админам
 	if not is_admin(message.from_user.id):
 		await bot.send_message(message.from_user.id, "Вы не являетесь администратором, поэтому функция недоступна")
 		return
@@ -130,7 +130,9 @@ async def add_product_cancel(message: Message, state=FSMContext):
 
 
 async def send_all_start(message: Message):
-	# todo: сделать проверку статуса, доступно только админам
+	if not is_admin(message.from_user.id):
+		await bot.send_message(message.from_user.id, "Вы не являетесь администратором, поэтому функция недоступна")
+		return
 	await message.reply('Ваше следующее сообщение отправится всем пользователям бота')
 	await ShowEveryoneStates.show.set()
 
