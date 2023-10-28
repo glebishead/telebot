@@ -5,7 +5,7 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-async def selecteverything():
+async def select_from_users():
     try:
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
@@ -25,4 +25,4 @@ async def selecteverything():
     finally:
         db.close()
 
-loop.run_until_complete(selecteverything())
+loop.run_until_complete(select_from_users())
