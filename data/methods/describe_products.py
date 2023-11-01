@@ -5,7 +5,7 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-async def describe_users():
+async def describe_products():
     try:
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
@@ -16,7 +16,7 @@ async def describe_users():
 
         await cursor.execute('USE db;')
 
-        await cursor.execute("DESCRIBE users;")
+        await cursor.execute("DESCRIBE items;")
         print(await cursor.fetchall())
 
     except aiomysql.Error as err:
