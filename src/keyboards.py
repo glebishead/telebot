@@ -2,6 +2,7 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 faq = {}  # todo: фунцкия получения часто задавыемых вопросов
 
+
 def faq_keyboard():
     button1 = KeyboardButton("моего вопроса нет в списке")
 
