@@ -16,7 +16,7 @@ async def describe_products():
 
         await cursor.execute('USE db;')
 
-        await cursor.execute("DESCRIBE prodcuts;")
+        await cursor.execute("DESCRIBE products;")
         print(await cursor.fetchall())
 
     except aiomysql.Error as err:

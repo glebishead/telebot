@@ -16,7 +16,7 @@ async def select_from_products():
 
         await cursor.execute('USE db;')
 
-        await cursor.execute("SELECT * FROM prodcts;")
+        await cursor.execute("SELECT * FROM products;")
         return await cursor.fetchall()
 
     except aiomysql.Error as err:

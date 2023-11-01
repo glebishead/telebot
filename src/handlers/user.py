@@ -2,13 +2,12 @@
 
 """
 
-from aiogram.types import Message
+from aiogram.types import Message, MediaGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from src import bot
-from data.methods.insert_into_users import insert_into_users
-from src import keyboards, dp
+from src import bot, keyboards, dp
+from data.methods import insert_into_users, select_from_products, insert_into_products
 
 
 class FSMSendMessageToAdmin(StatesGroup):
@@ -23,11 +22,47 @@ async def start(message: Message):
 
 
 async def send_contacts(message: Message):
-    await bot.send_message('Контакты: ---')
+    await message.answer('Контакты: ---')
 
 
 async def show_products(message: Message):
-    await bot.send_message('Товары: ---')
+    products = [*map(lambda x: x, await select_from_products())]
+    for product in products:
+        id, key, game_name, description, categories, images, videos, price, is_sold = product
+        caption = f'Ключ от игры {game_name}\n\n'\
+                  f'{description}\n'\
+                  f'Категории {categories}\n'\
+                  f'по цене {price}\n'
+        
+        if not is_sold:
+            main_image, *images = images.split(' - ')  # 'images' and 'videos' are strings of separated id
+            main_video, *videos = videos.split(' - ')
+            
+            if images or videos or (main_video and main_image):
+                media = MediaGroup()
+                
+                if main_image and main_video:
+                    media.attach_photo(main_image, caption=caption)
+                    media.attach_video(main_video)
+                elif main_image:
+                    media.attach_photo(main_image, caption=caption)
+                elif main_video:
+                    media.attach_video(main_video, caption=caption)
+                    
+                for image_id in images:
+                    media.attach_photo(image_id)
+                for video_id in videos:
+                    media.attach_video(video_id)
+                
+                await message.answer_media_group(media)
+                
+            elif main_image:
+                await message.answer_photo(main_image, caption=caption)
+                
+            elif main_video:
+                await message.answer_video(main_video, caption=caption)
+            else:
+                await message.answer(caption)
 
 
 @dp.message_handler(commands=['связаться с продавцом'])
@@ -48,6 +83,7 @@ async def start_adding_settings(message: Message):
     await FSMSendMessageToAdmin.message.set()
     await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)")
 
+
 @dp.message_handler(state=FSMSendMessageToAdmin.message)
 async def send_to_admin(message: Message, state: FSMContext):
     text = message.text
@@ -55,6 +91,7 @@ async def send_to_admin(message: Message, state: FSMContext):
         await bot.send_message(message.from_user.id, "Сообщение не отправлено, так как содержит оскорбления")
         return
     await bot.send_message(message.from_user.id, text)
+
 
 async def plug(message: Message):
     print(f"___Unresolved___\nMessage from: {message['from']}\nchat: {message['chat']}\ntext: {message.text}\n___")

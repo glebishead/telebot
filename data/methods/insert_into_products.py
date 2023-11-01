@@ -5,7 +5,7 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-async def insert_into_products(ItemID, key, game_name, description, categories, images, videos, price):
+async def insert_into_products(key, game_name, description, categories, images, videos, price):
     try:
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
@@ -16,10 +16,10 @@ async def insert_into_products(ItemID, key, game_name, description, categories, 
 
         await cursor.execute('USE db;')  # selecting db.db
 
-        insert_query = """INSERT INTO products (ItemID, key1, game_name, description, categories, images, videos, price, is_saled)
-                                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) """
+        insert_query = """INSERT INTO products (key1, game_name, description, categories, images, videos, price, is_saled)
+                                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s) """
 
-        dannie = (ItemID, key, game_name, description, categories, images, videos, price, '0')
+        dannie = (key, game_name, description, categories, images, videos, price, '0')
         # is_saled  устанавливается 0, т.е нет
 
         await cursor.execute(insert_query, dannie)
@@ -31,8 +31,4 @@ async def insert_into_products(ItemID, key, game_name, description, categories, 
 
     finally:
         db.close()  # connection close
-
-
-# loop.run_until_complete(databaseitems("4483gdfgdg42422", "ключ228", "названиеredalert3",
-# "описание текстовое", "категорияхз111", "изображение111", "видео111", "15000.99"))
 
