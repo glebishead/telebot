@@ -5,7 +5,6 @@
 from aiogram.dispatcher.filters import MediaGroupFilter
 
 
-from src import dp
 from .admin import *
 from .user import *
 
@@ -22,13 +21,13 @@ def register_user_handlers():
 	dp.register_message_handler(add_product_cancel, commands=['cancel'], state=AddProductStates.states)
 	
 	dp.register_message_handler(add_product_name, state=AddProductStates.name)
-	dp.register_message_handler(add_product_category, state=AddProductStates.category)
 	dp.register_message_handler(add_product_description, state=AddProductStates.description)
+	dp.register_message_handler(add_product_categories, state=AddProductStates.categories)
+	dp.register_message_handler(add_product_key, state=AddProductStates.key)
 	dp.register_message_handler(add_product_media_group, MediaGroupFilter(is_media_group=True),
 	                            content_types=['photo', 'video'], state=AddProductStates.media)
 	dp.register_message_handler(add_product_media, content_types=['photo', 'video'], state=AddProductStates.media)
 	dp.register_message_handler(add_product_price, state=AddProductStates.price)
-	dp.register_message_handler(add_product_quantity, state=AddProductStates.quantity)
 	
 	dp.register_message_handler(send_all_start, commands=['send_all'])
 	dp.register_message_handler(send_all_cancel, commands=['cancel'], state=ShowEveryoneStates.show)

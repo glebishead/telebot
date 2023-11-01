@@ -9,20 +9,21 @@ from aiogram.utils.exceptions import ChatNotFound
 from aiogram_media_group import media_group_handler
 
 from src import bot, ADMIN_ID
-from data.methods.select_from_users import select_from_users
-from data.methods.insert_into_users import insert_into_users
+from data.methods import select_from_users, insert_into_products, describe_products
+
 
 def is_admin(userid):
 	# todo: admin_list
 	return userid == ADMIN_ID
 
+
 class AddProductStates(StatesGroup):
 	name = State()
-	category = State()
 	description = State()
+	categories = State()
+	key = State()
 	media = State()
 	price = State()
-	quantity = State()
 
 
 class ShowEveryoneStates(StatesGroup):
@@ -40,13 +41,6 @@ async def add_product(message: Message):
 async def add_product_name(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['name'] = message.text
-	await bot.send_message(message.from_id, 'Введите категории товара')
-	await AddProductStates.next()
-
-
-async def add_product_category(message: Message, state=FSMContext):
-	async with state.proxy() as data:
-		data['category'] = message.text
 	await bot.send_message(message.from_id, 'Введите описание товара')
 	await AddProductStates.next()
 
@@ -54,6 +48,20 @@ async def add_product_category(message: Message, state=FSMContext):
 async def add_product_description(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['description'] = message.text
+	await bot.send_message(message.from_id, 'Введите категории товара')
+	await AddProductStates.next()
+
+
+async def add_product_categories(message: Message, state=FSMContext):
+	async with state.proxy() as data:
+		data['categories'] = message.text
+	await bot.send_message(message.from_id, 'Введите ключ steam')
+	await AddProductStates.next()
+
+	
+async def add_product_key(message: Message, state=FSMContext):
+	async with state.proxy() as data:
+		data['key'] = message.text
 	await bot.send_message(message.from_id, 'Прикрепите к сообщению фото и/или видео товара')
 	await AddProductStates.next()
 
@@ -91,36 +99,30 @@ async def add_product_media(message: Message, state=FSMContext):
 async def add_product_price(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['price'] = int(message.text)
-	await bot.send_message(message.from_id, 'Введите доступное на данный момент количество единиц товара')
-	await AddProductStates.next()
-
-
-async def add_product_quantity(message: Message, state=FSMContext):
-	async with state.proxy() as data:
-		data['quantity'] = message.text
 		if 'images' not in data.keys():
 			data['images'] = ''
 		if 'videos' not in data.keys():
 			data['videos'] = ''
 	
 	name = data['name']
-	category = data['category']
 	description = data['description']
+	categories = data['categories']
+	key = data['key']
 	images = ' - '.join(data['images'])
 	videos = ' - '.join(data['videos'])
 	price = data['price']
-	quantity = data['quantity']
 	
 	await bot.send_message(message.from_id, 'Вы добавили товар успешно!')
+	await insert_into_products(1, key, name, description, categories, images, videos, price)
 	await bot.send_message(message.from_id, f'Название: {name}\n'
-	                                        f'Категории: {category}\n'
+	                                        f'Ключ: {key}\n'
+	                                        f'Категории: {categories}\n'
 	                                        f'Описание: {description}\n'
 	                                        f'Изображения (id): {images}\n'
 	                                        f'Видео (id): {videos}\n'
-	                                        f'Цена: {price}\n'
-	                                        f'Количество: {quantity}\n')
+	                                        f'Цена: {price}\n')
 	await state.finish()
-
+	
 
 async def add_product_cancel(message: Message, state=FSMContext):
 	if await state.get_state() is None:
