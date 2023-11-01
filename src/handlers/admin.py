@@ -122,7 +122,6 @@ async def add_product_price(message: Message, state=FSMContext):
 	                                        f'Видео (id): {videos}\n'
 	                                        f'Цена: {price}\n')
 	await state.finish()
-	print(await describe_products())
 	
 
 async def add_product_cancel(message: Message, state=FSMContext):

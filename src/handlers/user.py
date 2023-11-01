@@ -8,7 +8,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from src import bot
 from data.methods.insert_into_users import insert_into_users
-from src import keyboards, ADMIN_ID
+from src import keyboards, dp
 
 
 class FSMSendMessageToAdmin(StatesGroup):

@@ -16,7 +16,7 @@ async def insert_into_products(ItemID, key, game_name, description, categories, 
 
         await cursor.execute('USE db;')  # selecting db.db
 
-        insert_query = """INSERT INTO items (ItemID, key1, game_name, description, categories, images, videos, price, is_saled) 
+        insert_query = """INSERT INTO products (ItemID, key1, game_name, description, categories, images, videos, price, is_saled)
                                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) """
 
         dannie = (ItemID, key, game_name, description, categories, images, videos, price, '0')

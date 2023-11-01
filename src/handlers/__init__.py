@@ -5,7 +5,6 @@
 from aiogram.dispatcher.filters import MediaGroupFilter
 
 
-from src import dp
 from .admin import *
 from .user import *
 

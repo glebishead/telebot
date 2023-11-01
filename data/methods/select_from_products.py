@@ -16,7 +16,7 @@ async def select_from_products():
 
         await cursor.execute('USE db;')
 
-        await cursor.execute("SELECT * FROM items;")
+        await cursor.execute("SELECT * FROM prodcts;")
         return await cursor.fetchall()
 
     except aiomysql.Error as err:
@@ -24,5 +24,3 @@ async def select_from_products():
 
     finally:
         db.close()
-
-loop.run_until_complete(select_from_users())
