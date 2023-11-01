@@ -8,9 +8,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram_media_group import media_group_handler
 
-from src import bot
+from src import bot, ADMIN_ID
 from data.methods import insert_into_products
-from ..admin import is_admin
+
+
+def is_admin(userid):
+	# todo: admin_list
+	return userid == ADMIN_ID
 
 
 class AddProductStates(StatesGroup):
@@ -105,14 +109,7 @@ async def add_product_price(message: Message, state=FSMContext):
 	price = data['price']
 	
 	await bot.send_message(message.from_id, 'Вы добавили товар успешно!')
-	# await insert_into_products(1, key, name, description, categories, images, videos, price)
-	await bot.send_message(message.from_id, f'Название: {name}\n'
-	                                        f'Ключ: {key}\n'
-	                                        f'Категории: {categories}\n'
-	                                        f'Описание: {description}\n'
-	                                        f'Изображения (id): {images}\n'
-	                                        f'Видео (id): {videos}\n'
-	                                        f'Цена: {price}\n')
+	await insert_into_products(key, name, description, categories, images, videos, price)
 	await state.finish()
 	
 

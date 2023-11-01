@@ -11,7 +11,7 @@ from aiogram_media_group import media_group_handler
 
 from src import bot
 from data.methods import select_from_users
-from ..admin import is_admin
+from .add_product import is_admin
 
 
 class ShowEveryoneStates(StatesGroup):
@@ -59,3 +59,4 @@ async def send_all_media_group_end(messages: list[Message], state: FSMContext):
 			print(f"Person with id {id} not found")
 	await messages[0].reply('Это сообщение было отправлено всем пользователям')
 	await state.finish()
+	
