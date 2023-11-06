@@ -1,17 +1,11 @@
 import asyncio
 import aiomysql
-import time
 
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-async def insert_into_users(telegram_id, user_id):
-
-    datetime = (time.strftime(
-        time.strftime("%Y-%m-%d", time.localtime())) + ' ' + time.strftime(
-        time.strftime("%H:%M:%S", time.localtime())))
-
+async def insert_into_users(user_id, is_admin):
     try:
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
@@ -22,10 +16,9 @@ async def insert_into_users(telegram_id, user_id):
 
         await cursor.execute('USE db;')  # selecting db.db
 
-        insert_query = """INSERT INTO users (user_id, regdatetime, is_admin) 
-                                        VALUES (%s, %s, %s, %s) """
+        insert_query = """UPDATE users SET is_admin = %s WHERE user_id = %s;"""
 
-        dannie = (user_id, datetime , '0')
+        dannie = (is_admin, user_id)
 
         await cursor.execute(insert_query, dannie)
 
