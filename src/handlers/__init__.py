@@ -9,14 +9,8 @@ from .admin import *
 from .user import *
 
 
-def register_user_handlers():
-	dp.register_message_handler(start, commands=['start'])
-	
-	# Обработчики событий от пользователя
-	dp.register_message_handler(send_contacts, commands=['contacts'])
-	dp.register_message_handler(show_products, commands=['show_products'])
-	
-	# Обработчики событий от админа
+def register_admin_handlers():
+	"""Обработчики событий от админа"""
 	dp.register_message_handler(add_product, commands=['add_product'])
 	dp.register_message_handler(add_product_cancel, commands=['cancel'], state=AddProductStates.states)
 	
@@ -33,11 +27,23 @@ def register_user_handlers():
 	dp.register_message_handler(send_all_cancel, commands=['cancel'], state=ShowEveryoneStates.show)
 	dp.register_message_handler(send_all_media_group_end, MediaGroupFilter(is_media_group=True),
 	                            content_types=['photo', 'video'], state=ShowEveryoneStates.show)
+	
 	dp.register_message_handler(send_all_end, content_types=['photo', 'video', 'sticker', 'text'],
 	                            state=ShowEveryoneStates.show)
+
+
+def register_user_handlers():
+	"""Обработчики событий от пользователя"""
+	dp.register_message_handler(start, commands=['start'])
 	
-	# оставить последним, это заглушка
-	dp.register_message_handler(plug)
+	dp.register_message_handler(send_contacts, commands=['contacts'])
+	dp.register_message_handler(show_products, commands=['show_products'])
+	
+	
+def register_all_handlers():
+	register_user_handlers()
+	register_admin_handlers()
+	dp.register_message_handler(plug)  # заглушка
 
 
-register_user_handlers()
+register_all_handlers()

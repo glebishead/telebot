@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from src import bot, keyboards, dp
-from data.methods import insert_into_users, select_from_products, insert_into_products
+from data.methods import insert_into_users, select_from_products, describe_users
 
 
 class FSMSendMessageToAdmin(StatesGroup):
@@ -15,9 +15,7 @@ class FSMSendMessageToAdmin(StatesGroup):
 
 
 async def start(message: Message):
-    with open(f'static/stickers/StartSticker.tgs') as sticker:
-        await bot.send_sticker(message.from_id, sticker)
-    await insert_into_users(message.from_id)
+    await insert_into_users(message.from_id, message.from_id)
     await message.reply('Hello')
 
 
