@@ -7,6 +7,7 @@ asyncio.set_event_loop(loop)
 # leave 0 if nothing should be changed
 # все кроме is_saled будет изменено, насчет is_saled я еще подумаю как сделать лучше
 
+
 async def edit_products(Item_ID, key1, game_name, description, categories, images, videos, price, is_saled):
     try:
         lis = [key1, game_name, description, categories, images, videos, price]
@@ -28,7 +29,6 @@ async def edit_products(Item_ID, key1, game_name, description, categories, image
         for i in li:
             lis1.pop(li[n])
             n += 1
-
 
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',
