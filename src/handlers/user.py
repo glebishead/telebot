@@ -5,7 +5,7 @@
 from aiogram.types import Message, MediaGroup
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from src import bot, dp, keyboards
+from src import bot, keyboards
 from data.methods import insert_into_users, select_from_products
 
 
@@ -14,7 +14,7 @@ class FSMSendMessageToAdmin(StatesGroup):
 
 
 async def start(message: Message):
-    await insert_into_users(message.from_id, message.from_id)
+    await insert_into_users(message.from_id)
     await message.reply('Hello')
 
 
@@ -22,7 +22,7 @@ async def send_contacts(message: Message):
     await message.answer('Контакты: ---')
 
 
-async def show_products(message: Message, reply_markup=None):
+async def show_products(message: Message):
     products = [*map(lambda x: x, await select_from_products())]
     for product in products:
         product_id, key, game_name, description, categories, images, videos, price, is_sold = product
@@ -60,10 +60,6 @@ async def show_products(message: Message, reply_markup=None):
                 await message.answer_video(main_video, caption=caption)
             else:
                 await message.answer(caption)
-
-            if reply_markup is not None:
-                await message.answer('', reply_markup=reply_markup)
-                return product_id
 
 
 async def connect_to_seller(message: Message):

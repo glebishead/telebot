@@ -6,7 +6,7 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-async def insert_into_users(telegram_id, user_id):
+async def insert_into_users(user_id):
 
     datetime = (time.strftime(
         time.strftime("%Y-%m-%d", time.localtime())) + ' ' + time.strftime(
@@ -22,10 +22,10 @@ async def insert_into_users(telegram_id, user_id):
 
         await cursor.execute('USE db;')  # selecting db.db
 
-        insert_query = """INSERT INTO users (user_id, regdatetime, is_admin) 
-                                        VALUES (%s, %s, %s, %s) """
+        insert_query = """INSERT INTO users (user_id, regdatetime, is_admin)
+                                        VALUES (%s, %s, %s) """
 
-        dannie = (user_id, datetime , '0')
+        dannie = (user_id, datetime, '0')
 
         await cursor.execute(insert_query, dannie)
 

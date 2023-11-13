@@ -29,7 +29,7 @@ async def send_all_start(message: Message):
 async def send_all_end(message: Message, state: FSMContext):
 	persons = [*await select_from_users()]
 	for person in persons:
-		person_id, _id, register_date, status = person
+		person_id, register_date, status = person
 		try:
 			await message.copy_to(person_id)
 		except ChatNotFound:
@@ -42,7 +42,7 @@ async def send_all_end(message: Message, state: FSMContext):
 async def send_all_media_group_end(messages: list[Message], state: FSMContext):
 	persons = [*await select_from_users()]
 	for person in persons:
-		person_id, _id, register_date, status = person
+		person_id, register_date, status = person
 		try:
 			media = MediaGroup()
 			main_message, *messages = messages
