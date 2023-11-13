@@ -3,11 +3,10 @@
 """
 
 from aiogram.types import Message, MediaGroup
-from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from src import bot, keyboards, dp
-from data.methods import insert_into_users, select_from_products, describe_users
+from src import bot, dp, keyboards
+from data.methods import insert_into_users, select_from_products
 
 
 class FSMSendMessageToAdmin(StatesGroup):
@@ -23,10 +22,10 @@ async def send_contacts(message: Message):
     await message.answer('Контакты: ---')
 
 
-async def show_products(message: Message):
+async def show_products(message: Message, reply_markup=None):
     products = [*map(lambda x: x, await select_from_products())]
     for product in products:
-        id, key, game_name, description, categories, images, videos, price, is_sold = product
+        product_id, key, game_name, description, categories, images, videos, price, is_sold = product
         caption = f'Ключ от игры {game_name}\n\n'\
                   f'{description}\n'\
                   f'Категории {categories}\n'\
@@ -62,13 +61,15 @@ async def show_products(message: Message):
             else:
                 await message.answer(caption)
 
+            if reply_markup is not None:
+                await message.answer('', reply_markup=reply_markup)
+                return product_id
 
-@dp.message_handler(commands=['связаться с продавцом'])
+
 async def connect_to_seller(message: Message):
     await bot.send_message(message.from_user.id, "Выберите категорию вопроса", reply_markup=keyboards.faq_keyboard())
 
 
-@dp.message_handler(commands=keyboards.faq.keys())
 async def answer(message: Message):
     answer_text = "Пока нет ответов на вопросы"
     # answer_text = faq[message.txt]
@@ -76,14 +77,12 @@ async def answer(message: Message):
     await bot.send_message(message.from_user.id, answer_text)
 
 
-@dp.message_handler(commands=["моего вопроса нет в списке"], state=None)
 async def start_adding_settings(message: Message):
     await FSMSendMessageToAdmin.message.set()
     await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)")
 
 
-@dp.message_handler(state=FSMSendMessageToAdmin.message)
-async def send_to_admin(message: Message, state: FSMContext):
+async def send_to_admin(message: Message):
     text = message.text
     if is_banned(text):
         await bot.send_message(message.from_user.id, "Сообщение не отправлено, так как содержит оскорбления")

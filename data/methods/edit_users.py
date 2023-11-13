@@ -5,7 +5,7 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-async def insert_into_users(user_id, is_admin):
+async def edit_users(user_id, is_admin):
     try:
         db = await aiomysql.connect(user='root',
                                     password='as1234dflolGG',

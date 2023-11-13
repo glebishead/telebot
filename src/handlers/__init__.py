@@ -30,6 +30,10 @@ def register_admin_handlers():
 	
 	dp.register_message_handler(send_all_end, content_types=['photo', 'video', 'sticker', 'text'],
 	                            state=ShowEveryoneStates.show)
+	
+	dp.register_message_handler(edit_status, commands=['edit_status'])
+	dp.register_message_handler(edit_status_person_id, state=EditStatusStates.to_admin)
+	dp.register_message_handler(edit_status_end, state=EditStatusStates.person_id)
 
 
 def register_user_handlers():
@@ -38,6 +42,11 @@ def register_user_handlers():
 	
 	dp.register_message_handler(send_contacts, commands=['contacts'])
 	dp.register_message_handler(show_products, commands=['show_products'])
+	
+	dp.register_message_handler(commands=['связаться с продавцом'])
+	dp.register_message_handler(commands=keyboards.faq.keys())
+	dp.register_message_handler(commands=["моего вопроса нет в списке"])
+	dp.register_message_handler(state=FSMSendMessageToAdmin.message)
 	
 	
 def register_all_handlers():
