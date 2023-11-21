@@ -1,6 +1,4 @@
 """Исполняемый файл проекта"""
-
-
 from logging import basicConfig, INFO
 
 from aiogram.utils import executor

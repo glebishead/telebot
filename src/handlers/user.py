@@ -14,52 +14,56 @@ class FSMSendMessageToAdmin(StatesGroup):
 
 
 async def start(message: Message):
-    await insert_into_users(message.from_id)
-    await message.reply('Hello')
-
-
-async def send_contacts(message: Message):
-    await message.answer('Контакты: ---')
+    try:
+        await insert_into_users(message.from_id)
+    except ValueError as ve:
+        print(ve)
+    await message.answer('Здоров, братиш, на связи <b>Celestial</b>\n\n'
+                         'У меня все товары высшего сорта, даже для тебя что-то да найдётся, пиши '
+                         '/products чтобы ознакомиться с <b>товарами</b>', parse_mode='html')
 
 
 async def show_products(message: Message):
-    products = [*map(lambda x: x, await select_from_products())]
-    for product in products:
-        product_id, key, game_name, description, categories, images, videos, price, is_sold = product
-        caption = f'Ключ от игры {game_name}\n\n'\
-                  f'{description}\n'\
-                  f'Категории {categories}\n'\
-                  f'по цене {price}\n'
-        
-        if not is_sold:
-            main_image, *images = images.split(' - ')  # 'images' and 'videos' are strings of separated id
-            main_video, *videos = videos.split(' - ')
+    try:
+        products = [*map(lambda x: x, await select_from_products())]
+        for product in products:
+            product_id, key, game_name, description, categories, images, videos, price, is_sold = product
+            caption = f'Ключ от игры {game_name}\n\n'\
+                      f'{description}\n'\
+                      f'Категории {categories}\n'\
+                      f'по цене {price}\n'
             
-            if images or videos or (main_video and main_image):
-                media = MediaGroup()
+            if not is_sold:
+                main_image, *images = images.split(' - ')  # 'images' and 'videos' are strings of separated id
+                main_video, *videos = videos.split(' - ')
                 
-                if main_image and main_video:
-                    media.attach_photo(main_image, caption=caption)
-                    media.attach_video(main_video)
-                elif main_image:
-                    media.attach_photo(main_image, caption=caption)
-                elif main_video:
-                    media.attach_video(main_video, caption=caption)
+                if images or videos or (main_video and main_image):
+                    media = MediaGroup()
                     
-                for image_id in images:
-                    media.attach_photo(image_id)
-                for video_id in videos:
-                    media.attach_video(video_id)
-                
-                await message.answer_media_group(media)
-                
-            elif main_image:
-                await message.answer_photo(main_image, caption=caption)
-                
-            elif main_video:
-                await message.answer_video(main_video, caption=caption)
-            else:
-                await message.answer(caption)
+                    if main_image and main_video:
+                        media.attach_photo(main_image, caption=caption)
+                        media.attach_video(main_video)
+                    elif main_image:
+                        media.attach_photo(main_image, caption=caption)
+                    elif main_video:
+                        media.attach_video(main_video, caption=caption)
+                        
+                    for image_id in images:
+                        media.attach_photo(image_id)
+                    for video_id in videos:
+                        media.attach_video(video_id)
+                    
+                    await message.answer_media_group(media)
+                    
+                elif main_image:
+                    await message.answer_photo(main_image, caption=caption)
+                    
+                elif main_video:
+                    await message.answer_video(main_video, caption=caption)
+                else:
+                    await message.answer(caption)
+    except Exception as e:
+        print(e)
 
 
 async def connect_to_seller(message: Message):

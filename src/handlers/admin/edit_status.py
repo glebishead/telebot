@@ -7,7 +7,8 @@ from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from src import bot, ADMIN_ID
+from src import bot
+from .is_admin import is_admin
 from data.methods import edit_users
 
 
@@ -16,13 +17,8 @@ class EditStatusStates(StatesGroup):
 	to_admin = State()
 
 
-def is_admin(userid):
-	# todo: admin_list
-	return userid == ADMIN_ID
-
-
 async def edit_status(message: Message):
-	if not is_admin(message.from_user.id):
+	if not await is_admin(message.from_user.id):
 		await bot.send_message(message.from_user.id, "Вы не являетесь администратором, поэтому функция недоступна")
 		return
 	await bot.send_message(message.from_id, 'Введите telegram id пользователя, статус которого хотите изменить')

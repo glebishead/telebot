@@ -1,68 +1,50 @@
-"""Обработчики сообщений от админа/ов, комманд администратора/ов
-с добавлением товара в базу данных
+"""Изменение товара
 
 """
 
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram_media_group import media_group_handler
 
-from src import bot
-from .is_admin import is_admin
+from src import bot, is_admin
 from data.methods import insert_into_products
+from ..user import show_products
 
 
-class AddProductStates(StatesGroup):
-	name = State()
-	description = State()
-	categories = State()
-	key = State()
-	media = State()
+class EditProductStates(StatesGroup):
+	info = State()
 	price = State()
 
 
-async def add_product(message: Message):
-	if not await is_admin(message.from_user.id):
+async def edit_product(message: Message, state=FSMContext):
+	if not is_admin(message.from_user.id):
 		await bot.send_message(message.from_user.id, "Вы не являетесь администратором, поэтому функция недоступна")
 		return
-	await bot.send_message(message.from_id, 'Введите название товара')
-	await AddProductStates.name.set()
-
-
-async def add_product_name(message: Message, state=FSMContext):
+	await bot.send_message(message.from_id, 'Выберите товар')
+	product_id = await show_products(message, reply_markup=InlineKeyboardMarkup(one_time_keyboard=True).add(
+		InlineKeyboardButton('Изменить', callback_data=f'edit')).add(
+		InlineKeyboardButton('Удалить', callback_data=f'delete')))
+	await EditProductStates.info.set()
 	async with state.proxy() as data:
-		data['name'] = message.text
-	await bot.send_message(message.from_id, 'Введите описание товара')
-	await AddProductStates.next()
+		data['product_id'] = product_id
 
 
-async def add_product_description(message: Message, state=FSMContext):
-	async with state.proxy() as data:
-		data['description'] = message.text
-	await bot.send_message(message.from_id, 'Введите категории товара')
-	await AddProductStates.next()
-
-
-async def add_product_categories(message: Message, state=FSMContext):
-	async with state.proxy() as data:
-		data['categories'] = message.text
-	await bot.send_message(message.from_id, 'Введите ключ steam')
-	await AddProductStates.next()
-
-	
-async def add_product_key(message: Message, state=FSMContext):
-	async with state.proxy() as data:
-		data['key'] = message.text
-	await bot.send_message(message.from_id, 'Прикрепите к сообщению фото и/или видео товара')
-	await AddProductStates.next()
+async def edit_product_info(callback: CallbackQuery, state=FSMContext):
+	if callback.data.startswith('delete'):
+		# удалить товар из бд
+		pass
+	else:
+		await bot.send_message(callback.message.from_id, 'Введите новую товара')
+		await EditProductStates.next()
 
 
 @media_group_handler
-async def add_product_media_group(messages: list[Message], state=FSMContext):
+async def edit_product_media_group(messages: list[Message], state=FSMContext):
 	"""В телеграмме фото и видео имеют уникальный file_id,
 	который можно отправить и сохранить в базу данных
-	
+
 	"""
 	async with state.proxy() as data:
 		for message in messages:
@@ -75,20 +57,20 @@ async def add_product_media_group(messages: list[Message], state=FSMContext):
 			elif 'videos' in data.keys() and message.video:
 				data['videos'].append(message.video['file_id'])
 	await bot.send_message(message.from_id, 'Введите цену товара')
-	await AddProductStates.next()
+	await EditProductStates.next()
 
 
-async def add_product_media(message: Message, state=FSMContext):
+async def edit_product_media(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		if message.photo:
 			data['images'] = [message.photo[-1].file_id]
 		elif message.video:
 			data['videos'] = [message.video['file_id']]
 	await bot.send_message(message.from_id, 'Введите цену товара')
-	await AddProductStates.next()
+	await EditProductStates.next()
 
 
-async def add_product_price(message: Message, state=FSMContext):
+async def edit_product_price(message: Message, state=FSMContext):
 	async with state.proxy() as data:
 		data['price'] = int(message.text)
 		if 'images' not in data.keys():
@@ -107,10 +89,10 @@ async def add_product_price(message: Message, state=FSMContext):
 	await bot.send_message(message.from_id, 'Вы добавили товар успешно!')
 	await insert_into_products(key, name, description, categories, images, videos, price)
 	await state.finish()
-	
 
-async def add_product_cancel(message: Message, state=FSMContext):
+
+async def edit_product_cancel(message: Message, state=FSMContext):
 	if await state.get_state() is None:
 		return
-	await bot.send_message(message.from_id, 'Добавление товара прекращено')
+	await bot.send_message(message.from_id, 'Изменение товара прекращено')
 	await state.finish()
