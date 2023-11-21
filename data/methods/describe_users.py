@@ -7,12 +7,12 @@ asyncio.set_event_loop(loop)
 
 async def describe_users():
     try:
-        db = await aiomysql.connect(user='root',
-                                    password='as1234dflolGG',
-                                    host='78.36.203.224',
-                                    db='db')
+        connection = await aiomysql.connect(user='root',
+                                            password='as1234dflolGG',
+                                            host='78.36.203.224',
+                                            db='db')
 
-        cursor = await db.cursor()
+        cursor = await connection.cursor()
 
         await cursor.execute('USE db;')
 
@@ -23,4 +23,4 @@ async def describe_users():
         print(err)
 
     finally:
-        db.close()
+        await connection.close()

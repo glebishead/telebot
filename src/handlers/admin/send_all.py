@@ -10,8 +10,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram_media_group import media_group_handler
 
 from src import bot
+from .is_admin import is_admin
 from data.methods import select_from_users
-from .add_product import is_admin
 
 
 class ShowEveryoneStates(StatesGroup):
@@ -19,7 +19,7 @@ class ShowEveryoneStates(StatesGroup):
 
 
 async def send_all_start(message: Message):
-	if not is_admin(message.from_user.id):
+	if not await is_admin(message.from_user.id):
 		await bot.send_message(message.from_user.id, "Вы не являетесь администратором, поэтому функция недоступна")
 		return
 	await message.reply('Ваше следующее сообщение отправится всем пользователям бота')

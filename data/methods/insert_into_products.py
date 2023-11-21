@@ -7,12 +7,12 @@ asyncio.set_event_loop(loop)
 
 async def insert_into_products(key, game_name, description, categories, images, videos, price):
     try:
-        db = await aiomysql.connect(user='root',
-                                    password='as1234dflolGG',
-                                    host='78.36.203.224',
-                                    db='db')  # connection open
+        connection = await aiomysql.connect(user='root',
+                                            password='as1234dflolGG',
+                                            host='78.36.203.224',
+                                            db='db')  # connection open
 
-        cursor = await db.cursor()
+        cursor = await connection.cursor()
 
         await cursor.execute('USE db;')  # selecting db.db
 
@@ -24,11 +24,11 @@ async def insert_into_products(key, game_name, description, categories, images, 
 
         await cursor.execute(insert_query, dannie)
 
-        await db.commit()
+        await connection.commit()
 
     except aiomysql.Error as err:
         print(err)
 
     finally:
-        db.close()  # connection close
+        await connection.close()
 

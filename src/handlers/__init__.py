@@ -41,8 +41,7 @@ def register_user_handlers():
 	"""Обработчики событий от пользователя"""
 	dp.register_message_handler(start, commands=['start'])
 	
-	dp.register_message_handler(send_contacts, commands=['contacts'])
-	dp.register_message_handler(show_products, commands=['show_products'])
+	dp.register_message_handler(show_products, commands=['products'])
 	
 	dp.register_message_handler(connect_to_seller, commands=['связаться с продавцом'])
 	dp.register_message_handler(answer, commands=keyboards.faq.keys())

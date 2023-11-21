@@ -30,12 +30,12 @@ async def edit_products(Item_ID, key1, game_name, description, categories, image
             lis1.pop(li[n])
             n += 1
 
-        db = await aiomysql.connect(user='root',
-                                    password='as1234dflolGG',
-                                    host='78.36.203.224',
-                                    db='db')  # connection open
+        connection = await aiomysql.connect(user='root',
+                                            password='as1234dflolGG',
+                                            host='78.36.203.224',
+                                            db='db')  # connection open
 
-        cursor = await db.cursor()
+        cursor = await connection.cursor()
 
         await cursor.execute('USE db;')  # selecting db.db
 
@@ -55,12 +55,13 @@ async def edit_products(Item_ID, key1, game_name, description, categories, image
         print(curso)
         await cursor.execute(curso)
 
-        await db.commit()
+        await connection.commit()
 
     except aiomysql.Error as err:
         print(err)
 
     finally:
-        db.close()  # connection close
+        connection.close()
 
-#loop.run_until_complete(edit_products("7", "key121", "0", 'desc5435345', "0", 'imagegfgf', 'video000', '15000.99', '0'))
+#loop.run_until_complete(edit_products("7",
+# "key121", "0", 'desc5435345', "0", 'imagegfgf', 'video000', '15000.99', '0'))
