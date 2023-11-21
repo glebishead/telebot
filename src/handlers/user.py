@@ -4,8 +4,10 @@
 
 from aiogram.types import Message, MediaGroup
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.dispatcher import FSMContext
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-from src import bot, keyboards
+from src import bot, faq_keyboard, ADMIN_ID
 from data.methods import insert_into_users, select_from_products
 
 
@@ -67,27 +69,28 @@ async def show_products(message: Message):
 
 
 async def connect_to_seller(message: Message):
-    await bot.send_message(message.from_user.id, "Выберите категорию вопроса", reply_markup=keyboards.faq_keyboard())
+    await bot.send_message(message.from_user.id, "Выберите категорию вопроса", reply_markup=faq_keyboard.faq_keyboard())
 
 
 async def answer(message: Message):
-    answer_text = "Пока нет ответов на вопросы"
-    # answer_text = faq[message.txt]
-    # todo: раскоментировать, если есть faq и удалить первое определение answer_text
+    answer_text = faq_keyboard.get_faq()[message.text]
     await bot.send_message(message.from_user.id, answer_text)
 
 
 async def start_adding_settings(message: Message):
     await FSMSendMessageToAdmin.message.set()
-    await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)")
+    cancel_b = KeyboardButton("/cancel")
+    cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(cancel_b)
+    await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)", reply_markup=cancel_kb)
 
 
-async def send_to_admin(message: Message):
+async def send_to_admin(message: Message, state: FSMContext):
     text = message.text
     if is_banned(text):
         await bot.send_message(message.from_user.id, "Сообщение не отправлено, так как содержит оскорбления")
         return
-    await bot.send_message(message.from_user.id, text)
+    await bot.send_message(ADMIN_ID, text)
+    await state.finish()
 
 
 async def plug(message: Message):
@@ -95,5 +98,4 @@ async def plug(message: Message):
 
 
 def is_banned(text):
-    # todo: фильтр плохих слов чтобы не кибербуллили админов
     return False
