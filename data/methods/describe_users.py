@@ -23,4 +23,4 @@ async def describe_users():
         print(err)
 
     finally:
-        await connection.close()
+        connection.close()

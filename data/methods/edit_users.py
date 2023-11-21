@@ -28,5 +28,5 @@ async def edit_users(user_id, is_admin):
         print(err)
 
     finally:
-        await connection.close()
+        connection.close()
 

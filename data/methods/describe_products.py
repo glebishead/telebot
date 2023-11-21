@@ -23,4 +23,4 @@ async def describe_products():
         print(err)
 
     finally:
-        await connection.close()
+        connection.close()

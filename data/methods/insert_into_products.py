@@ -30,5 +30,5 @@ async def insert_into_products(key, game_name, description, categories, images, 
         print(err)
 
     finally:
-        await connection.close()
+        connection.close()
 
