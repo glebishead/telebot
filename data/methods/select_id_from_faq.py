@@ -29,4 +29,4 @@ async def select_from_faq(id):
     finally:
         db.close()
 
-print(loop.run_until_complete(select_from_faq(2)))
+# print(loop.run_until_complete(select_from_faq(2)))

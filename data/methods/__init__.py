@@ -6,3 +6,4 @@ from .describe_users import describe_users
 from .describe_products import describe_products
 from .edit_products import edit_products
 from .edit_users import edit_users
+from .select_id_from_faq import select_from_faq

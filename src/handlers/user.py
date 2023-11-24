@@ -9,6 +9,7 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from src import bot, faq_keyboard, ADMIN_ID
 from data.methods import insert_into_users, select_from_products
+from ..faq_keyboard import faq_keyboard
 
 
 class FSMSendMessageToAdmin(StatesGroup):
@@ -69,7 +70,9 @@ async def show_products(message: Message):
 
 
 async def connect_to_seller(message: Message):
-    await bot.send_message(message.from_user.id, "Выберите категорию вопроса", reply_markup=faq_keyboard.faq_keyboard())
+    markup = await faq_keyboard()
+    await bot.send_message(message.from_user.id, "Выберите категорию вопроса",
+                           reply_markup=markup)
 
 
 async def answer(message: Message):

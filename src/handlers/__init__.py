@@ -1,13 +1,19 @@
 """Автоматически исполняемый файл, регистрирует обработчики сообщений
 
 """
+import asyncio
 
 from aiogram.dispatcher.filters import MediaGroupFilter
 
 
-from src import dp, faq_keyboard
+from src import dp
 from .admin import *
 from .user import *
+from ..faq_keyboard import get_faq
+
+
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 
 def register_admin_handlers():
@@ -37,22 +43,23 @@ def register_admin_handlers():
 	dp.register_message_handler(edit_status_end, state=EditStatusStates.person_id)
 
 
-def register_user_handlers():
+async def register_user_handlers():
 	"""Обработчики событий от пользователя"""
 	dp.register_message_handler(start, commands=['start'])
 	
 	dp.register_message_handler(show_products, commands=['products'])
 	
-	dp.register_message_handler(connect_to_seller, commands=['связаться с продавцом'])
-	dp.register_message_handler(answer, commands=faq_keyboard.get_faq().keys())
-	dp.register_message_handler(start_adding_settings, commands=["моего вопроса нет в списке"])
+	dp.register_message_handler(connect_to_seller, commands=['contact_seller'])
+	keys = await get_faq()
+	dp.register_message_handler(answer, commands=[*map(lambda x: x, keys.keys())])
+	dp.register_message_handler(start_adding_settings, commands=["no_mine_question"])
 	dp.register_message_handler(send_to_admin, state=FSMSendMessageToAdmin.message)
 	
 	
-def register_all_handlers():
-	register_user_handlers()
+async def register_all_handlers():
+	await register_user_handlers()
 	register_admin_handlers()
 	dp.register_message_handler(plug)  # заглушка
 
 
-register_all_handlers()
+loop.run_until_complete(register_all_handlers())
