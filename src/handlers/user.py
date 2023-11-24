@@ -7,9 +7,9 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-from src import bot, faq_keyboard, ADMIN_ID
+from src import bot, ADMIN_ID
 from data.methods import insert_into_users, select_from_products
-from ..faq_keyboard import faq_keyboard
+from ..keyboard import get_faq, faq_keyboard, ConnectSellerStates
 
 
 class FSMSendMessageToAdmin(StatesGroup):
@@ -73,14 +73,17 @@ async def connect_to_seller(message: Message):
     markup = await faq_keyboard()
     await bot.send_message(message.from_user.id, "Выберите категорию вопроса",
                            reply_markup=markup)
+    await ConnectSellerStates.question.set()
 
 
-async def answer(message: Message):
-    answer_text = faq_keyboard.get_faq()[message.text]
+async def answer(message: Message, state=FSMContext):
+    dict_ = await get_faq()
+    answer_text = dict_[message.text.replace('/', '')]
     await bot.send_message(message.from_user.id, answer_text)
+    await state.finish()
 
 
-async def start_adding_settings(message: Message):
+async def start_adding_settings(message: Message, state=FSMContext):
     await FSMSendMessageToAdmin.message.set()
     cancel_b = KeyboardButton("/cancel")
     cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(cancel_b)
@@ -91,7 +94,8 @@ async def send_to_admin(message: Message, state: FSMContext):
     text = message.text
     if text == "/cancel":
         bot.send_message(message.from_user.id, "Отправка отменена")
-        await state.finish()
+        if state is not None:
+            await state.finish()
         return
     if is_banned(text):
         await bot.send_message(message.from_user.id, "Сообщение не отправлено, так как содержит оскорбления")

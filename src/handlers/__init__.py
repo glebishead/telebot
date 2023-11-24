@@ -9,7 +9,7 @@ from aiogram.dispatcher.filters import MediaGroupFilter
 from src import dp
 from .admin import *
 from .user import *
-from ..faq_keyboard import get_faq
+from ..keyboard import get_faq, ConnectSellerStates
 
 
 loop = asyncio.new_event_loop()
@@ -51,8 +51,8 @@ async def register_user_handlers():
 	
 	dp.register_message_handler(connect_to_seller, commands=['contact_seller'])
 	keys = await get_faq()
-	dp.register_message_handler(answer, commands=[*map(lambda x: x, keys.keys())])
-	dp.register_message_handler(start_adding_settings, commands=["no_mine_question"])
+	dp.register_message_handler(answer, state=ConnectSellerStates.question)
+	dp.register_message_handler(start_adding_settings, commands=["моего вопроса нет в списке"])
 	dp.register_message_handler(send_to_admin, state=FSMSendMessageToAdmin.message)
 	
 	

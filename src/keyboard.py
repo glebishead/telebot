@@ -1,8 +1,14 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from data.methods import select_from_faq
 
 Q_COUNT = 3
+
+
+class ConnectSellerStates(StatesGroup):
+    question = State()
+    answer = State()
 
 
 async def get_faq():
@@ -14,7 +20,7 @@ async def get_faq():
 
 
 async def faq_keyboard():
-    button0 = KeyboardButton("моего вопроса нет в списке")
+    button0 = KeyboardButton("/моего вопроса нет в списке")
 
     result_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     keys = await get_faq()
