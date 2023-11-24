@@ -103,7 +103,7 @@ async def plug(message: Message):
 
 
 def is_banned(text):
-    with open("filter_profanity_russian.txt", "rt") as file:
+    with open("../../static/filter_profanity_russian.txt", "rt") as file:
         banned = file.readlines()
     for word in banned:
         for i in range(text):
