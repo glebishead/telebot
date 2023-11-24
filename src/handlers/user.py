@@ -4,8 +4,10 @@
 
 from aiogram.types import Message, MediaGroup
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.dispatcher import FSMContext
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-from src import bot, keyboards
+from src import bot, faq_keyboard, ADMIN_ID
 from data.methods import insert_into_users, select_from_products
 
 
@@ -28,18 +30,18 @@ async def show_products(message: Message):
         products = [*map(lambda x: x, await select_from_products())]
         for product in products:
             product_id, key, game_name, description, categories, images, videos, price, is_sold = product
-            caption = f'Ключ от игры {game_name}\n\n'\
-                      f'{description}\n'\
-                      f'Категории {categories}\n'\
+            caption = f'Ключ от игры {game_name}\n\n' \
+                      f'{description}\n' \
+                      f'Категории {categories}\n' \
                       f'по цене {price}\n'
-            
+
             if not is_sold:
                 main_image, *images = images.split(' - ')  # 'images' and 'videos' are strings of separated id
                 main_video, *videos = videos.split(' - ')
-                
+
                 if images or videos or (main_video and main_image):
                     media = MediaGroup()
-                    
+
                     if main_image and main_video:
                         media.attach_photo(main_image, caption=caption)
                         media.attach_video(main_video)
@@ -47,17 +49,17 @@ async def show_products(message: Message):
                         media.attach_photo(main_image, caption=caption)
                     elif main_video:
                         media.attach_video(main_video, caption=caption)
-                        
+
                     for image_id in images:
                         media.attach_photo(image_id)
                     for video_id in videos:
                         media.attach_video(video_id)
-                    
+
                     await message.answer_media_group(media)
-                    
+
                 elif main_image:
                     await message.answer_photo(main_image, caption=caption)
-                    
+
                 elif main_video:
                     await message.answer_video(main_video, caption=caption)
                 else:
@@ -67,27 +69,33 @@ async def show_products(message: Message):
 
 
 async def connect_to_seller(message: Message):
-    await bot.send_message(message.from_user.id, "Выберите категорию вопроса", reply_markup=keyboards.faq_keyboard())
+    await bot.send_message(message.from_user.id, "Выберите категорию вопроса", reply_markup=faq_keyboard.faq_keyboard())
 
 
 async def answer(message: Message):
-    answer_text = "Пока нет ответов на вопросы"
-    # answer_text = faq[message.txt]
-    # todo: раскоментировать, если есть faq и удалить первое определение answer_text
+    answer_text = faq_keyboard.get_faq()[message.text]
     await bot.send_message(message.from_user.id, answer_text)
 
 
 async def start_adding_settings(message: Message):
     await FSMSendMessageToAdmin.message.set()
-    await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)")
+    cancel_b = KeyboardButton("/cancel")
+    cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(cancel_b)
+    await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)", reply_markup=cancel_kb)
 
 
-async def send_to_admin(message: Message):
+async def send_to_admin(message: Message, state: FSMContext):
     text = message.text
+    if text == "/cancel":
+        bot.send_message(message.from_user.id, "Отправка отменена")
+        await state.finish()
+        return
     if is_banned(text):
         await bot.send_message(message.from_user.id, "Сообщение не отправлено, так как содержит оскорбления")
+        await state.finish()
         return
-    await bot.send_message(message.from_user.id, text)
+    await bot.send_message(ADMIN_ID, text)
+    await state.finish()
 
 
 async def plug(message: Message):
@@ -95,5 +103,12 @@ async def plug(message: Message):
 
 
 def is_banned(text):
-    # todo: фильтр плохих слов чтобы не кибербуллили админов
+    with open("filter_profanity_russian.txt", "rt") as file:
+        banned = file.readlines()
+    for word in banned:
+        for i in range(text):
+            chunk = text[i: i + len(word)]
+            for w in banned:
+                if chunk == w:
+                    return True
     return False

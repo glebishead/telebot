@@ -5,7 +5,7 @@
 from aiogram.dispatcher.filters import MediaGroupFilter
 
 
-from src import dp
+from src import dp, faq_keyboard
 from .admin import *
 from .user import *
 
@@ -44,7 +44,7 @@ def register_user_handlers():
 	dp.register_message_handler(show_products, commands=['products'])
 	
 	dp.register_message_handler(connect_to_seller, commands=['связаться с продавцом'])
-	dp.register_message_handler(answer, commands=keyboards.faq.keys())
+	dp.register_message_handler(answer, commands=faq_keyboard.get_faq().keys())
 	dp.register_message_handler(start_adding_settings, commands=["моего вопроса нет в списке"])
 	dp.register_message_handler(send_to_admin, state=FSMSendMessageToAdmin.message)
 	
