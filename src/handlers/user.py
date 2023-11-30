@@ -3,17 +3,12 @@
 """
 
 from aiogram.types import Message, MediaGroup
-from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from src import bot, ADMIN_ID
 from data.methods import insert_into_users, select_from_products
 from ..keyboard import get_faq, faq_keyboard, ConnectSellerStates
-
-
-class FSMSendMessageToAdmin(StatesGroup):
-    message = State()
 
 
 async def start(message: Message):
@@ -80,32 +75,31 @@ async def answer(message: Message, state: FSMContext):
     dict_ = await get_faq()
     answer_text = dict_.get(message.text.replace('/', ''), None)
     if answer_text is None:
-        await ConnectSellerStates.answer.set()
-        return
-    await bot.send_message(message.from_user.id, answer_text)
-    await state.finish()
+        print("переходим к написанию вопроса")
+        await ConnectSellerStates.next()
+    else:
+        print("ответ краткий")
+        await bot.send_message(message.from_user.id, answer_text)
+        await state.finish()
 
 
 async def start_adding_settings(message: Message, state: FSMContext):
-    await state.finish()
+    print("бот просит написать вопрос")
     cancel_b = KeyboardButton("/cancel")
     cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(cancel_b)
-    await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)", reply_markup=cancel_kb)
-    await FSMSendMessageToAdmin.message.set()
+    await bot.send_message(message.from_user.id, "Напишите свой вопрос", reply_markup=cancel_kb)
+    await ConnectSellerStates.next()
 
 
 async def send_to_admin(message: Message, state: FSMContext):
     text = message.text
-    if text == "/cancel":
-        bot.send_message(message.from_user.id, "Отправка отменена")
-        if state is not None:
-            await state.finish()
-        return
     if is_banned(text):
         await bot.send_message(message.from_user.id, "Сообщение не отправлено, так как содержит оскорбления")
         await state.finish()
         return
     await bot.send_message(ADMIN_ID, text)
+    print("скинул админу")
+    await bot.send_message(message.from_user.id, "Сообщение успешно отправлено")
     await state.finish()
 
 

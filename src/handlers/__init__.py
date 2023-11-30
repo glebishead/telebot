@@ -53,7 +53,7 @@ async def register_user_handlers():
 	keys = await get_faq()
 	dp.register_message_handler(answer, state=ConnectSellerStates.question)
 	dp.register_message_handler(start_adding_settings, state=ConnectSellerStates.answer)
-	dp.register_message_handler(send_to_admin, state=FSMSendMessageToAdmin.message)
+	dp.register_message_handler(send_to_admin, state=ConnectSellerStates.send_message)
 
 	
 async def register_all_handlers():
