@@ -52,9 +52,9 @@ async def register_user_handlers():
 	dp.register_message_handler(connect_to_seller, commands=['contact_seller'])
 	keys = await get_faq()
 	dp.register_message_handler(answer, state=ConnectSellerStates.question)
-	dp.register_message_handler(start_adding_settings, commands=["моего вопроса нет в списке"])
+	dp.register_message_handler(start_adding_settings, state=ConnectSellerStates.answer)
 	dp.register_message_handler(send_to_admin, state=FSMSendMessageToAdmin.message)
-	
+
 	
 async def register_all_handlers():
 	await register_user_handlers()
