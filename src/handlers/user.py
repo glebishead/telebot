@@ -77,18 +77,21 @@ async def answer(message: Message, state: FSMContext):
     if answer_text is None:
         print("переходим к написанию вопроса")
         await ConnectSellerStates.next()
+        return
     else:
         print("ответ краткий")
         await bot.send_message(message.from_user.id, answer_text)
         await state.finish()
+        return
 
 
-async def start_adding_settings(message: Message, state: FSMContext):
+async def start_adding_settings(message: Message, state=FSMContext):
     print("бот просит написать вопрос")
     cancel_b = KeyboardButton("/cancel")
     cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(cancel_b)
     await bot.send_message(message.from_user.id, "Напишите свой вопрос", reply_markup=cancel_kb)
     await ConnectSellerStates.next()
+    return
 
 
 async def send_to_admin(message: Message, state: FSMContext):
@@ -101,6 +104,7 @@ async def send_to_admin(message: Message, state: FSMContext):
     print("скинул админу")
     await bot.send_message(message.from_user.id, "Сообщение успешно отправлено")
     await state.finish()
+    return
 
 
 async def plug(message: Message):
