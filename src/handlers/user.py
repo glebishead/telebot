@@ -83,8 +83,8 @@ async def answer(message: Message, state: FSMContext):
     await state.finish()
 
 
-async def start_adding_settings(message: Message, state: FSMSendMessageToAdmin):
-    await state.message.set()
+async def start_adding_settings(message: Message):
+    await FSMSendMessageToAdmin.message.set()
     cancel_b = KeyboardButton("/cancel")
     cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(cancel_b)
     await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)", reply_markup=cancel_kb)
