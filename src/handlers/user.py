@@ -80,7 +80,7 @@ async def answer(message: Message, state: FSMContext):
     dict_ = await get_faq()
     answer_text = dict_.get(message.text.replace('/', ''), None)
     if answer_text is None:
-        ConnectSellerStates.answer.set()
+        await ConnectSellerStates.answer.set()
         await state.finish()
         return
     await bot.send_message(message.from_user.id, answer_text)
