@@ -9,6 +9,7 @@ Q_COUNT = 3
 class ConnectSellerStates(StatesGroup):
     question = State()
     answer = State()
+    send_message = State()
 
 
 async def get_faq():
