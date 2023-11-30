@@ -81,13 +81,13 @@ async def answer(message: Message, state: FSMContext):
     answer_text = dict_.get(message.text.replace('/', ''), None)
     if answer_text is None:
         await ConnectSellerStates.answer.set()
-        await state.finish()
         return
     await bot.send_message(message.from_user.id, answer_text)
     await state.finish()
 
 
 async def start_adding_settings(message: Message, state: FSMContext):
+    await state.finish()
     cancel_b = KeyboardButton("/cancel")
     cancel_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(cancel_b)
     await bot.send_message(message.from_user.id, "Напишите свой вопрос(/cancel для отмены)", reply_markup=cancel_kb)
