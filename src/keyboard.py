@@ -20,7 +20,7 @@ async def get_faq():
 
 
 async def faq_keyboard():
-    button0 = KeyboardButton("/моего вопроса нет в списке")
+    button0 = KeyboardButton("моего вопроса нет в списке")
 
     result_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     keys = await get_faq()
